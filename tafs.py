@@ -19,37 +19,44 @@ def taf_datetime_difference(a, b):
     dt.datetime.strptime(a, '%D')
 
 
-def get_taf_as_dict(taf):
-    '''
-    Function to return a dictionary each item of which is a change group
-    item 0 will always be the base conditions
-    item zero in each key will always be the change group
-    '''
-    taf = taf.split(' ')
-    taf_dict_key = 0
-    taf_dict = {0: []}
-    for word_from_taf in taf:
-        if word_from_taf in SPLITS:
-            taf_dict_key = taf_dict_key + 1
-            taf_dict[taf_dict_key] = [word_from_taf]
-        else:
-            taf_dict[taf_dict_key] = taf_dict[taf_dict_key] + [word_from_taf]
-    taf_dict['base_time'] = taf_dict[0][2][:4]
-    return taf_dict
 
 
 class TafGroup():
     '''
     comments
     '''
-    def __init__(self, start_group, end_group=None, is_base=False):
-        self.raw = start_group
-        self.start = self.pull_apart(start_group)
-        self.end = end_group
-        self.is_base = is_base
+    def __init__(self, taf):
+        self.base = self.get_taf_as_dict()
+        #self.raw = start_group
+        #self.start = self.pull_apart(start_group)
+        #self.end = end_group
+        #self.is_base = is_base
+        for _, item in self.base.iteritems():
+            item = item.pull_apart()
 
     def __str__(self):
-        return str(self.start)
+        return str(self.base)
+
+
+    def get_taf_as_dict(taf):
+        '''
+        Function to return a dictionary each item of which is a change group
+        item 0 will always be the base conditions
+        item zero in each key will always be the change group
+        '''
+        taf = taf.split(' ')
+        taf_dict_key = 0
+        taf_dict = {0: []}
+        for word_from_taf in taf:
+            if word_from_taf in SPLITS:
+                taf_dict_key = taf_dict_key + 1
+                taf_dict[taf_dict_key] = [word_from_taf]
+            else:
+                taf_dict[taf_dict_key] = taf_dict[taf_dict_key] + [word_from_taf]
+        taf_dict['base_time'] = taf_dict[0][2][:4]
+        return taf_dict
+
+
 
     def get_cloud_group_dict(self, clouds, mil_rules=True):
         '''
@@ -129,6 +136,7 @@ class TafGroup():
             elif word in ALLOWED_WX:
                 out['wx'].append(word)
         out['clouds'] = self.cloud_analysis(clouds)
+        out['start_time_since_base'] = "pete"
         return out
 
     def html_pretties(self):
@@ -142,12 +150,14 @@ class TafGroup():
         html += "</tr>"
         return html
 
+
 def main():
     '''
     blah
     '''
-    eg_taf = get_taf_as_dict(EXAMPLE)
+    eg_taf = TafGroup(EXAMPLE)
     print eg_taf
+    
                      
     
 if __name__ == "__main__":
