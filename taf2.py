@@ -18,7 +18,7 @@ class Taf():
         self.groups_proc = self.process_groups()
 
     def __str__(self):
-        return str(self.groups_raw)
+        return str(self.groups_proc)
 
     def get_taf_as_dict(self):
         '''
@@ -40,15 +40,16 @@ class Taf():
 
     def process_groups(self):
         for label, group in self.groups_raw.iteritems():
-            if label == 0:
-                return self.process_group(self, zero_group=True)
-            elif label == 'base_time':
+            if label == 'base_time':
                 pass
             else:
-                return self.process_group(self, zero_group=False)
+                out = self.process_group()
+            return out
 
-    def process_group(self, zero_group=False):
-        pass
+    def process_group(self):
+        out = {'clouds': [], 'wx': [], 'duration': 0, 'vis':None, 'vis_colour':{'colour': 'NIL', 'hex': '#00000000'}}        
+
+        return out
 
 
     def taf_datetime_difference(a, b):
