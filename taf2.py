@@ -15,6 +15,7 @@ class Taf():
     def __init__(self, raw):
         self.raw = raw
         self.groups_raw = self.get_taf_as_dict()
+        self.groups_proc = self.process_groups()
 
     def __str__(self):
         return str(self.groups_raw)
@@ -37,6 +38,18 @@ class Taf():
         taf_dict['base_time'] = taf_dict[0][2][:4]
         return taf_dict
 
+    def process_groups(self):
+        for label, group in self.groups_raw.iteritems():
+            if label == 0:
+                return self.process_group(self, zero_group=True)
+            elif label == 'base_time':
+                pass
+            else:
+                return self.process_group(self, zero_group=False)
+
+    def process_group(self, zero_group=False):
+        pass
+
 
     def taf_datetime_difference(a, b):
         '''
@@ -45,6 +58,7 @@ class Taf():
         '''
         import datetime as dt
         dt.datetime.strptime(a, '%D')
+
 
 
 
