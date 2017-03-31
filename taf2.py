@@ -20,8 +20,11 @@ class Taf():
     def __str__(self):
         a = self.groups_raw
         b = self.groups_proc        
-        msg = "\nGroups raw is:\n{}\nGroups proc is:\n{}".format(a,b)
+        msg = "\nGroups raw is:\n{}\nGroups proc is:\n".format(a)
+        for key, item in b.iteritems():
+            msg = msg + str(key) + " : " + str(item) + "\n\n"
         return msg
+
 
     def get_taf_as_dict(self):
         '''
@@ -68,7 +71,22 @@ class Taf():
             if cloud['height'] < lowest_base and cloud['amt'] in sig_cloud:
                 lowest_base = cloud['height']
         out.append({'lowest_base': lowest_base})
+        if lowest_base < 2500:
+            out.append({'colour': 'WHT', 'hex': ''})
+        elif lowest_base < 1500:
+            out.append({'colour': 'GRN', 'hex': ''})
+        elif lowest_base < 700:
+            out.append({'colour': 'YL01', 'hex': ''})
+        elif lowest_base < 500:
+            out.append({'colour': 'YLO2', 'hex': ''})
+        elif lowest_base < 300:
+            out.append({'colour': 'AMB', 'hex': ''})
+        elif lowest_base < 200:
+            out.append({'colour': 'RED', 'hex': ''})
+        else:
+            out.append({'colour': 'BLU', 'hex': ''})
         return out
+
 
     def cloud_analysis(self, clouds):
         '''
@@ -80,7 +98,12 @@ class Taf():
             clouds = self.get_cloud_group_dict(clouds)
             return clouds
 
+
     def vis_colour(self, vis):
+        '''
+        Takes a raw vis and returns a vis colour dictionary including
+        both colour state and a hex code for plotting that colour
+        '''
         if vis > 7999:
             vis_colour = {'colour': 'BLU', 'hex':'#0000EE'}
         elif vis > 4999:
@@ -100,6 +123,15 @@ class Taf():
         return vis_colour
 
 
+
+    def guess_year_month(self):
+        '''
+        guesses the appropriate year and month
+        @TODO - implement this!
+        '''
+        return "201703"
+
+
     def dict_tafgroup(self, tafgroup):
         '''
         takes taf data and turns it into a dict.
@@ -107,18 +139,23 @@ class Taf():
         out = {'clouds': [], 'wx': [], 'duration': 0, 'vis':None, 'vis_colour':{'colour': 'NIL', 'hex': '#00000000'}}
         clouds = []
         for word in tafgroup:
+            # this will break if vv/// is in forecast :(
             if '/' in word:
                 out['time_group'] = word
-                out['hour_start'] = word.split('/')[0][2:]
-                out['hour_end'] = word.split('/')[1][2:]
-                out['day_start'] = word.split('/')[0][:2]
-                out['day_end'] = word.split('/')[1][:2]
-                end_time = 24 * int(out['day_end']) + int(out['hour_end'])
-                start_time = 24 * int(out['day_start']) + int(out['hour_start'])
-                out['duration'] = end_time - start_time
+                times = word.split('/')
+                times.append(self.groups_raw['base_time'])
+                times2 = []
+                for time in times:
+                    time = self.guess_year_month() + time
+                    times2.append(dt.datetime.strptime(time, "%Y%m%d%H"))
+                print times2
+                out['time_start'] = times2[0]
+                out['time_end'] = times2[1]
+                out['time_start_since_ref'] = (times2[0] - times2[2]).seconds // 3600
+                out['duration'] = (times2[1] - times2[0]).seconds // 3600
             elif word in SPLITS:
                 out['change_type'] = word
-            elif len(word) == 4 and isinstance(int(word), int):
+            elif len(word) == 4:
                 out['vis'] = int(word)
                 out['vis_colour'] = self.vis_colour(int(word))
             elif word[-2:] == "KT":
@@ -129,7 +166,7 @@ class Taf():
             elif word in ALLOWED_WX:
                 out['wx'].append(word)
         out['clouds'] = self.cloud_analysis(clouds)
-        out['start_time_since_base'] = "Dave"
+        
 
         return out
 
@@ -165,8 +202,9 @@ def main():
     '''
     print Taf(EXAMPLE)
 
+
     
                      
-    
+        
 if __name__ == "__main__":
     main()
