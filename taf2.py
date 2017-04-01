@@ -11,7 +11,7 @@ ALLOWED_WX = ['-RA']
 
 TABLE = "<table border=2>"
 TABLE_ = "</table>"
-TR = "<tr>"
+TR = "\n<tr>"
 TR_ = "</tr>"
 TD = "<td>"
 TD_ = "</td>"
@@ -34,33 +34,55 @@ class Taf():
 
 
     def html_out(self):
-        table_width = self.groups_proc["total_duration"]
-        out = TABLE + TR
-        out = out + ((TD + "xxxxxx" + TD_) * self.groups_proc['total_duration'])
-        out = out + TR_
+        "Creates an html table with output"
+        out = "<br>{}<br>".format(self.groups_proc['ICAO'])
+        out = out + TABLE + TR
+        out = out + "<td colspan={}>{}</td>".format(self.groups_proc['total_duration'],
+                                                    " ".join(self.groups_raw[0]))
+        out = out + TR_ + TR
+        i = 0
+        while i < self.groups_proc['total_duration']:
+            start =(int(self.groups_proc['base_time']))
+            out = out + TD + str(start + i) + TD_
+            i += 1
         out = out + TR + self.groups_proc['base_group']['vis_colour']['colour'] + TR_
         for key, item in self.groups_proc.iteritems():
             out = out + TR
             if isinstance(key, int):
                 # group_type
                 # <td colspan = {}>
-                out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
-                out = out + "<td colspan={}>{}</td>".format(item['duration'],
+                if item['time_start_since_ref'] == 0:
+                    out = out + "<td colspan={}>{}</td>".format(item['duration'],
                                                             item['change_type'])
-                out = out + TR_ + TR
-                # vis                
-                out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
-                out = out + "<td colspan={}>{} - {}</td>".format(item['duration'],
-                                                            item['vis_colour']['colour'],
-                                                            item['vis'])
-                out = out + TR_ + TR
-                # cloud                
-                out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
-                out = out + "<td colspan={}>{} - {}</td>".format(item['duration'], "tba", "tba")
-                out = out + TR_ + TR
-                # wind               
-                out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
-                out = out + "<td colspan={}>{}</td>".format(item['duration'], item['wind'])
+                    out = out + TR_ + TR
+                    # vis                
+                    out = out + "<td colspan={}>{} - {}</td>".format(item['duration'],
+                                                                item['vis_colour']['colour'],
+                                                                item['vis'])
+                    out = out + TR_ + TR
+                    # cloud   
+                    out = out + "<td colspan={}>{} - {}</td>".format(item['duration'], "tba", "tba")
+                    out = out + TR_ + TR
+                    # wind
+                    out = out + "<td colspan={}>{}</td>".format(item['duration'], item['wind'])
+                else:            
+                    out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
+                    out = out + "<td colspan={}>{}</td>".format(item['duration'],
+                                                            item['change_type'])
+                    out = out + TR_ + TR
+                    # vis                
+                    out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
+                    out = out + "<td colspan={}>{} - {}</td>".format(item['duration'],
+                                                                item['vis_colour']['colour'],
+                                                                item['vis'])
+                    out = out + TR_ + TR
+                    # cloud                
+                    out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
+                    out = out + "<td colspan={}>{} - {}</td>".format(item['duration'], "tba", "tba")
+                    out = out + TR_ + TR
+                    # wind               
+                    out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
+                    out = out + "<td colspan={}>{}</td>".format(item['duration'], item['wind'])
 
 
             else:
