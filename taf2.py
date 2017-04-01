@@ -9,6 +9,13 @@ EXAMPLE = '''EGXE 161400Z 1615/1702 22015KT 9999 FEW020 SCT025 TEMPO 1622/1702 2
 SPLITS = ['BECMG', 'TEMPO', 'PROB40', 'PROB30']
 ALLOWED_WX = ['-RA']
 
+TABLE = "<table border=2>"
+TABLE_ = "</table>"
+TR = "<tr>"
+TR_ = "</tr>"
+TD = "<td>"
+TD_ = "</td>"
+
 
 class Taf():
 
@@ -27,8 +34,43 @@ class Taf():
 
 
     def html_out(self):
-        return(None)
-        
+        table_width = self.groups_proc["total_duration"]
+        out = TABLE + TR
+        out = out + ((TD + "xxxxxx" + TD_) * self.groups_proc['total_duration'])
+        out = out + TR_
+        out = out + TR + self.groups_proc['base_group']['vis_colour']['colour'] + TR_
+        for key, item in self.groups_proc.iteritems():
+            out = out + TR
+            if isinstance(key, int):
+                # group_type
+                # <td colspan = {}>
+                out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
+                out = out + "<td colspan={}>{}</td>".format(item['duration'],
+                                                            item['change_type'])
+                out = out + TR_ + TR
+                # vis                
+                out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
+                out = out + "<td colspan={}>{} - {}</td>".format(item['duration'],
+                                                            item['vis_colour']['colour'],
+                                                            item['vis'])
+                out = out + TR_ + TR
+                # cloud                
+                out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
+                out = out + "<td colspan={}>{} - {}</td>".format(item['duration'], "tba", "tba")
+                out = out + TR_ + TR
+                # wind               
+                out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
+                out = out + "<td colspan={}>{}</td>".format(item['duration'], item['wind'])
+
+
+            else:
+                pass
+            out = out + TR_
+        out = out + TABLE_
+        return(out)
+
+
+    # def html_tr(self)   
 
 
     def get_taf_as_dict(self):
@@ -167,7 +209,6 @@ class Taf():
                 for time in times:
                     time = self.guess_year_month() + time
                     times2.append(dt.datetime.strptime(time, "%Y%m%d%H"))
-                print times2
                 out['time_start'] = times2[0]
                 out['time_end'] = times2[1]
                 out['time_start_since_ref'] = (times2[0] - times2[2]).seconds // 3600
@@ -221,6 +262,7 @@ def main():
     blah
     '''
     print Taf(EXAMPLE)
+    print Taf(EXAMPLE).html_out()
 
 
     
