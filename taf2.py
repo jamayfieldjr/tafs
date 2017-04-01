@@ -26,6 +26,11 @@ class Taf():
         return msg
 
 
+    def html_out(self):
+        return(None)
+        
+
+
     def get_taf_as_dict(self):
         '''
         Function to return a dictionary each item of which is a change group
@@ -86,6 +91,20 @@ class Taf():
         else:
             out.append({'colour': 'BLU', 'hex': ''})
         return out
+
+
+    def taf_duration(self, timegr):
+        '''
+        Takes a DDHH/DDHH timegroup and
+        returns a length in hours
+        @todo: Make fail sensibly
+        '''
+        start, end = timegr.split('/')
+        times2 = []
+        for time in [start, end]:
+            time = self.guess_year_month() + time
+            times2.append(dt.datetime.strptime(time, "%Y%m%d%H"))
+        return((times2[1] - times2[0]).seconds // 3600)
 
 
     def cloud_analysis(self, clouds):
@@ -178,6 +197,7 @@ class Taf():
                 out['base_time'] = tafgroup
             elif label == 0:
                 out['ICAO'] = tafgroup[0]
+                out['total_duration'] = self.taf_duration(tafgroup[2])
                 out['base_group'] = self.dict_tafgroup(tafgroup[3:])
             else:
                 out[label] = self.dict_tafgroup(tafgroup)
