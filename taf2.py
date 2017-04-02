@@ -43,8 +43,14 @@ class Taf():
         """
         out = "<br>{}<br>".format(self.groups_proc['ICAO'])
         out = out + TABLE + TR
-        out = out + "<td colspan={}>{}</td>".format(self.groups_proc['total_duration'],
-                                                    " ".join(self.groups_raw[0]))
+        # out = out + "<td colspan={}>{}</td>".format(self.groups_proc['total_duration'],
+                                               #     " ".join(self.groups_raw[0]))
+        out = out + "<td colspan={}>Wind: {}</td></tr>".format(self.groups_proc['total_duration'],
+                                                    self.groups_proc['base_group']['wind'])
+        out = out + "<td colspan={} bgcolor={}>Visibility {} M</td></tr>".format(self.groups_proc['total_duration'], self.groups_proc['base_group']['vis_colour']['hex'],
+                                                    self.groups_proc['base_group']['vis'])
+        out = out + "<td colspan={} bgcolor={}>Lowest Cloud Base {} FT</td></tr>".format(self.groups_proc['total_duration'], self.groups_proc['base_group']['clouds']['colour']['hex'],
+                                                    self.groups_proc['base_group']['clouds']['lowest_base'])
         out = out + TR_ + TR
         i = 0
         while i < self.groups_proc['total_duration']:
