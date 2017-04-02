@@ -188,7 +188,7 @@ item['vis_colour']['hex'],
         takes a list of clouds in string form and returns dicts
         '''
         if len(clouds) == 0:
-            return {'colour': {'colour': 'BLU', 'hex': ''}, 'lowest_base':'no lowest sig base'}
+            return {'colour': {'colour': '', 'hex': ''}, 'lowest_base':'no lowest sig base'}
         else:
             clouds = self.get_cloud_group_dict(clouds)
             return clouds
