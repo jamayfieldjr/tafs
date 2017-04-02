@@ -51,7 +51,7 @@ class Taf():
             start =(int(self.groups_proc['base_time']))
             out = out + TD + str(start + i) + TD_
             i += 1
-        out = out + TR + self.groups_proc['base_group']['vis_colour']['colour'] + TR_
+        # out = out + TR + self.groups_proc['base_group']['vis_colour']['colour'] + TR_
         for key, item in self.groups_proc.iteritems():
             out = out + TR
             if isinstance(key, int):
@@ -297,7 +297,8 @@ def main():
     '''
     print Taf(EXAMPLE)
     print Taf(EXAMPLE).html_out()
-
+    fh = open('html.html', 'w')
+    fh.write("{}\n{}\n{}".format("<HTML>", Taf(EXAMPLE).html_out(), "</HTML>"))
 
     
                      
