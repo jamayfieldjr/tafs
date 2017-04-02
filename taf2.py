@@ -17,6 +17,15 @@ TR_ = "</tr>"
 TD = "<td>"
 TD_ = "</td>"
 
+COLOURS = {"BLU": {'colour':'BLU', 'hex':'#0000EE'},
+           "WHT": {'colour':'WHT', 'hex': '#EEEEEE'},
+           "GRN": {'colour':'GRN', 'hex': '#00EE00'},
+           "YLO1": {'colour':'YL01', 'hex': '#00EEEE'},
+           "YLO2": {'colour':'YLO2', 'hex': '#00AAAA'},
+           "AMB": {'colour':'AMB', 'hex': '#CC8888'},
+           "RED": {'colour':'RED', 'hex': '#EE0000'},
+           "BLACK": {'colour':'NIL', 'hex': '#000000'}}
+
 
 class Taf():
 
@@ -157,21 +166,21 @@ item['vis_colour']['hex'],
                 lowest_base = cloud['height']
         out['lowest_base'] = lowest_base
         if lowest_base >= 2500:
-            out['colour'] = {'colour':'BLU', 'hex':'#0000EE'}        
+            out['colour'] = COLOURS['BLU']       
         elif lowest_base < 2500:
-            out['colour'] = {'colour':'WHT', 'hex': '#EEEEEE'}
+            out['colour'] = COLOURS['WHT']
         elif lowest_base < 1500:
-            out['colour'] = {'colour':'GRN', 'hex': '#00EE00'}
+            out['colour'] = COLOURS['GRN']
         elif lowest_base < 700:
-            out['colour'] = {'colour':'YL01', 'hex': '#00EEEE'}
+            out['colour'] = COLOURS['YLO1']
         elif lowest_base < 500:
-            out['colour'] = {'colour':'YLO2', 'hex': '#00AAAA'}
+            out['colour'] = COLOURS['YLO2']
         elif lowest_base < 300:
-            out['colour'] = {'colour':'AMB', 'hex': '#CC8888'}
+            out['colour'] = COLOURS['AMB']
         elif lowest_base < 200:
-            out['colour'] = {'colour':'RED', 'hex': '#EE0000'}
+            out['colour'] = COLOURS['RED']
         else:
-            out['colour'] = {'colour':'NIL', 'hex': '#000000'}
+            out['colour'] = COLOURS['BLACK']
         return out
 
 
@@ -206,21 +215,21 @@ item['vis_colour']['hex'],
         both colour state and a hex code for plotting that colour
         '''
         if vis > 7999:
-            vis_colour = {'colour': 'BLU', 'hex':'#0000EE'}
+            vis_colour = COLOURS['BLU']
         elif vis > 4999:
-            vis_colour = {'colour': 'WHT', 'hex':'#EEEEEE'}
+            vis_colour = COLOURS['WHT']
         elif vis > 3699:
-            vis_colour = {'colour': 'GRN', 'hex':'#00EE00'}
+            vis_colour = COLOURS['GRN']
         elif vis > 2499:
-            vis_colour = {'colour': 'YLO1', 'hex':'#00EEEE'}
+            vis_colour = COLOURS['YLO1']
         elif vis > 1599:
-            vis_colour = {'colour': 'YLO2', 'hex':'#00AAAA'}
+            vis_colour = COLOURS['YLO2']
         elif vis > 799:
-            vis_colour = {'colour': 'AMB', 'hex':'#CC8888'}
+            vis_colour = COLOURS['AMB']
         elif vis < 800:
-            vis_colour = {'colour': 'RED', 'hex':'#EE0000'}
+            vis_colour = COLOURS['RED']
         else:
-            vis_colour = {'colour': 'ERR', 'hex':'#000000'}
+            vis_colour = COLOURS['BLACK']
         return vis_colour
 
 
