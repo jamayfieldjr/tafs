@@ -8,6 +8,7 @@ import datetime as dt
 EXAMPLE = '''EGXE 161400Z 1615/1702 22015KT 9999 FEW020 SCT025 TEMPO 1622/1702 24022G32KT SCT020 BECMG 1615/1619 5000 -RA 30010KT'''
 SPLITS = ['BECMG', 'TEMPO', 'PROB40', 'PROB30']
 ALLOWED_WX = ['-RA']
+CLOUD_AMTS = ['FEW','SCT','BKN','OVC']
 
 TABLE = "<table border=2>"
 TABLE_ = "</table>"
@@ -34,7 +35,12 @@ class Taf():
 
 
     def html_out(self):
-        "Creates an html table with output"
+        """
+        Creates an html table with output
+        @todo tidy up - 
+            work out how.format works and 
+            put all inputs in tidy lists
+        """
         out = "<br>{}<br>".format(self.groups_proc['ICAO'])
         out = out + TABLE + TR
         out = out + "<td colspan={}>{}</td>".format(self.groups_proc['total_duration'],
@@ -55,13 +61,14 @@ class Taf():
                     out = out + "<td colspan={}>{}</td>".format(item['duration'],
                                                             item['change_type'])
                     out = out + TR_ + TR
-                    # vis                
-                    out = out + "<td colspan={}>{} - {}</td>".format(item['duration'],
+                    # vis     
+                    out = out + "<td colspan={} bgcolor={}>{} - {}</td>".format(item['duration'],
+                                                                item['vis_colour']['hex'],
                                                                 item['vis_colour']['colour'],
                                                                 item['vis'])
                     out = out + TR_ + TR
                     # cloud   
-                    out = out + "<td colspan={}>{} - {}</td>".format(item['duration'], "tba", "tba")
+                    out = out + "<td colspan={} bgcolor={}>{} - {}</td>".format(item['duration'], item['clouds']['colour']['hex'], item['clouds']['colour']['colour'], item['clouds']['lowest_base'])
                     out = out + TR_ + TR
                     # wind
                     out = out + "<td colspan={}>{}</td>".format(item['duration'], item['wind'])
@@ -72,13 +79,14 @@ class Taf():
                     out = out + TR_ + TR
                     # vis                
                     out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
-                    out = out + "<td colspan={}>{} - {}</td>".format(item['duration'],
+                    out = out + "<td colspan={} bgcolor={}>{} - {}</td>".format(item['duration'],
+item['vis_colour']['hex'],
                                                                 item['vis_colour']['colour'],
                                                                 item['vis'])
                     out = out + TR_ + TR
                     # cloud                
                     out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
-                    out = out + "<td colspan={}>{} - {}</td>".format(item['duration'], "tba", "tba")
+                    out = out + "<td colspan={} bgcolor={}>{} - {} FT</td>".format(item['duration'], item['clouds']['colour']['hex'] ,item['clouds']['colour']['colour'], item['clouds']['lowest_base'])
                     out = out + TR_ + TR
                     # wind               
                     out = out + "<td colspan={}></td>".format(item['time_start_since_ref'])
@@ -131,29 +139,33 @@ class Taf():
             sig_cloud = ['SCT', 'BKN', 'OVC']
         elif mil_rules is False:
             sig_cloud = ['BKN', 'OVC']
-        out = []
-        for cloud in clouds:
+        out = {'groups':[]}
+        
+        for cloud in clouds:            
             detail = {'height': int(cloud[3:]) * 100, 'amt': cloud[:3]}
-            out.append(detail)
+            out['groups'].append(detail)
+                
         lowest_base = 10000
-        for cloud in out:
+        for cloud in out['groups']:
             if cloud['height'] < lowest_base and cloud['amt'] in sig_cloud:
                 lowest_base = cloud['height']
-        out.append({'lowest_base': lowest_base})
-        if lowest_base < 2500:
-            out.append({'colour': 'WHT', 'hex': ''})
+        out['lowest_base'] = lowest_base
+        if lowest_base >= 2500:
+            out['colour'] = {'colour':'BLU', 'hex':'#0000EE'}        
+        elif lowest_base < 2500:
+            out['colour'] = {'colour':'WHT', 'hex': '#EEEEEE'}
         elif lowest_base < 1500:
-            out.append({'colour': 'GRN', 'hex': ''})
+            out['colour'] = {'colour':'GRN', 'hex': '#00EE00'}
         elif lowest_base < 700:
-            out.append({'colour': 'YL01', 'hex': ''})
+            out['colour'] = {'colour':'YL01', 'hex': '#00EEEE'}
         elif lowest_base < 500:
-            out.append({'colour': 'YLO2', 'hex': ''})
+            out['colour'] = {'colour':'YLO2', 'hex': '#00AAAA'}
         elif lowest_base < 300:
-            out.append({'colour': 'AMB', 'hex': ''})
+            out['colour'] = {'colour':'AMB', 'hex': '#CC8888'}
         elif lowest_base < 200:
-            out.append({'colour': 'RED', 'hex': ''})
+            out['colour'] = {'colour':'RED', 'hex': '#EE0000'}
         else:
-            out.append({'colour': 'BLU', 'hex': ''})
+            out['colour'] = {'colour':'NIL', 'hex': '#000000'}
         return out
 
 
@@ -176,7 +188,7 @@ class Taf():
         takes a list of clouds in string form and returns dicts
         '''
         if len(clouds) == 0:
-            return ['nsc']
+            return {'colour': {'colour': 'BLU', 'hex': ''}, 'lowest_base':'no lowest sig base'}
         else:
             clouds = self.get_cloud_group_dict(clouds)
             return clouds
@@ -243,7 +255,7 @@ class Taf():
             elif word[-2:] == "KT":
                 out['wind'] = word
                 out['max_wind'] = word[-4:-2]
-            elif len(word) == 6:
+            elif word[:3] in CLOUD_AMTS:
                 clouds.append(word)
             elif word in ALLOWED_WX:
                 out['wx'].append(word)
